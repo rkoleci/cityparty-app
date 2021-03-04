@@ -1,0 +1,9 @@
+[submodule "SoftUp/core"]
+	path = SoftUp/core
+	url = https://gitlab.com/restaurant-saas/core.git
+[submodule "SoftUp/mobile-client/core"]
+	path = SoftUp/mobile-client/core
+	url = https://gitlab.com/restaurant-saas/core.git
+[submodule "SoftUp/mobile-client/sdk"]
+	path = SoftUp/mobile-client/sdk
+	url = https://gitlab.com/restaurant-saas/sdk.git
