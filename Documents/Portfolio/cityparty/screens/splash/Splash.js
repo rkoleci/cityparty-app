@@ -9,7 +9,7 @@ const SplashScreen = ({ navigation }) => {
    navigation.navigate('Welcome');
   return (
     <ViewWrapper styles={styles.container}>
-      <Image style={styles.logo} source={require('../../assets/logo/logo_normal.png')} />
+      <Image style={styles.logo} source={require('../../assets/logo/logo_main.png')} />
       <Text style={styles.text}>Cityparty</Text>
     </ViewWrapper>
   )

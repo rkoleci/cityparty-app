@@ -10,7 +10,7 @@ const Error = ({ isError, error }) => {
     )
 }
 
-const Input = ({ field, value, onChange, placeholder, styles, secureTextEntry, error }) => {
+const Input = ({ field, value, onChange, placeholder, styles, inputStyles, secureTextEntry, error, errorVisible }) => {
 
     const isError = () => error && error.field == field
 
@@ -24,7 +24,8 @@ const Input = ({ field, value, onChange, placeholder, styles, secureTextEntry, e
                     onChangeText={text => onChange(text)}
                     style={[style.appInput,
                     { fontFamily: 'Roboto', fontWeight: '700' },
-                    { borderColor: isError() ? colors.RED : '#C4C4C4' }
+                    { borderColor: isError() ? colors.RED : '#C4C4C4' },
+                        inputStyles
                     ]}
                     secureTextEntry={secureTextEntry}
                 />
@@ -32,7 +33,7 @@ const Input = ({ field, value, onChange, placeholder, styles, secureTextEntry, e
                     <Icon name="close" size={22} style={style.icon} />
                 </TouchableOpacity>}
             </View>
-            {<Error isError={isError} error={error} />}
+            {errorVisible && <Error isError={isError} error={error} />}
         </View>
     )
 }

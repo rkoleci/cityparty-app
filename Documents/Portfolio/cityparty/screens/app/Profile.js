@@ -4,46 +4,14 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 import colors from '../../colors'
 import { Tag } from '../../common'
+import utils from '../../core/utils'
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 const interests = ['design', 'grafica', 'travel', 'moda', 'fashion',]
 const pic = '../../assets/logo.png'
-const photos = [pic, pic, pic, pic, pic, pic, pic, pic]
-
-const toGrid = (arr) => {
-  let grid = []
-
-  for (let i = 0; i < arr.length; i += 3) {
-    let row = []
-
-    if (arr[i]) {
-      row[0] = arr[i]
-    }
-    if (arr[i + 1]) {
-      row[1] = arr[i + 1]
-    }
-    if (arr[i + 2]) {
-      row[2] = arr[i + 2]
-    }
-
-
-    if (row.length == 1) {
-      row[1] = ""
-      row[2] = ""
-    }
-
-    if (row.length == 2) {
-      row[2] = ""
-    }
-
-    grid[i] = row
-  }
-
- 
-  return grid
-}
+const photos = [pic, pic, pic, pic, pic, pic, pic, pic] 
 
 const Header = () => {
   return (
@@ -74,7 +42,7 @@ const Bio = () => {
 const Interests = () => {
   return (
     <View style={{ paddingHorizontal: 10, marginBottom: 20 }}>
-      {toGrid(interests).filter(i => Array.isArray(i)).map(row => {
+      {utils.toGrid(interests).filter(i => Array.isArray(i)).map(row => {
         return (
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 10, paddingRight: 10, marginBottom: 10 }}>
             {row.map((rowItem, x) => <View style={{ width: (windowWidth - 62) / 3 }}>{rowItem != '' && <Tag text={rowItem} disabled pressed={true} />}</View>)}
@@ -107,7 +75,7 @@ const SocialLinks = () => {
 const Photos = () => {
   return (
     <View>
-      {toGrid(photos).filter(i => Array.isArray(i)).map((row) => {
+      {utils.toGrid(photos).filter(i => Array.isArray(i)).map((row) => {
         return (
           <View style={{ flexDirection: 'row' }}>
             {row.map((rowItem, pos) => <View style={{ flex: 1, alignItems: 'center' }}>

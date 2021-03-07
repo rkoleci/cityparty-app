@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector, connect } from 'react-redux'
-import { ScrollView, StyleSheet, View, TouchableWithoutFeedback, TouchableHighlight, Image, Text, TextInput, Platform } from 'react-native'
+import { ScrollView, StyleSheet, View, TouchableHighlight, Image, Text, TextInput, Platform, } from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import * as ImagePicker from 'expo-image-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
-import { Avatar, MainBtn, Loading } from '../../common'
+import { Avatar, MainBtn, Loading, Select, Tag, Input } from '../../common'
 import { uploadPhoto, createProfile } from '../../core/actions/loginActions'
+import { getCities, getInterests } from '../../core/actions/city'
 import colors from '../../colors'
 import utils from '../../core/utils'
+const profilePicture = "http://res.cloudinary.com/dtgih45wb/image/upload/v1614350577/profile_pictures/ovp1snyqlhrjlbyrq4nh.png"
+
 
 const Section = ({ label, children, last }) => {
     return (
@@ -20,26 +23,100 @@ const Section = ({ label, children, last }) => {
     )
 }
 
-const CreateProfile = ({ route, navigation, uploadPhotoAction, createProfileAction }) => {
-    const { token } = route.params;
+const InterestsView = ({ list, onChange }) => {
+    return (
+        <View style={{}}>
+            {utils.toGrid(list).filter(i => Array.isArray(i)).map(row => {
+                return (
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
+                        {row.map((rowItem, pos) => {
+                            return (
+                                <View style={{ flex: 1, marginHorizontal: pos == 1 ? 10 : 0 }}>{rowItem != '' && <Tag text={rowItem} pressed={false} onChange={(pressed) => onChange(rowItem, pressed)} />}</View>
+                            )
+                        })}
+                    </View>
+                )
+            })}
+        </View>
+    )
+}
 
-    const [data, setData] = useState({ name: '', place: '', bio: '', image: '', imageUrl: '', sex: '', date: utils.dateToObject(new Date()) })
+const CreateProfile = ({ route, navigation, uploadPhotoAction, createProfileAction, getCitiesList, getInterestsList }) => {
+    const { token } = route.params ?? '';
+    // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IlkiLCJyb2xlIjoiVVNFUiIsImlkIjo1LCJpYXQiOjE2MTQ5NTg5OTcsImV4cCI6MTYxNzU1MDk5N30.psXnQrfh3cdOnPSNAwuvk2KrBl0QMPtojyJ1Vh_xiVI"
+    const [data, setData] = useState({ name: '', bio: '', image: '', imageUrl: '', city: '', sex: '', profilePicture, interests: [], date: utils.dateToObject(new Date()) })
     const [date, setDate] = useState(new Date())
-    const [show, setShow] = useState(false) 
+    const [show, setShow] = useState(false)
+    const [status, setStatus] = useState({ status: '', result: '' })
 
-    const creteProfile = useSelector(state => state.creteProfile)
+    const createProfile = useSelector(state => state.createProfile)
+    const citiesList = useSelector(state => state.cities)
+    const interests = useSelector(state => state.interests)
+
+    console.log(createProfile)
 
     useEffect(() => {
         navigation.setOptions({ title: '', headerShown: true })
+        askPhotosPermission()
+        getCitiesList({ search: '', token: token })
+        getInterestsList()
     }, [])
 
-    const onProceed = () => {
-        createProfileAction({ ...data, token: token })
-    }
 
-    const onDateChange = (date) => {
-        setData({ ...data, ['date']: utils.dateToObject(date) })
-        setShow(false)
+    useEffect(() => {
+        if (data.image) {
+            uploadPhotoAction({ token: token, image: data.image })
+        }
+    }, [data.image])
+
+    useEffect(() => {
+        setStatus({ status: '', result: '' })
+      }, [data])
+
+    useEffect(() => {
+        const { creating, created, errored, error, data } = createProfile
+
+        if (creating) {
+            setStatus({ status: 'loading', result: '' })
+            return
+        }
+
+        if (created && data && data.success == true && data.result && data.result == 'Profile created!') {
+            navigation.navigate('Main', { screen: 'Profile' });
+            setStatus({ status: 'result', result: data.result })
+            return
+        }
+
+        if (created && data && data.success == false && data.result && data.result) {
+            setStatus({ status: 'result', result: data.result })
+            return
+        }
+
+        if (errored && error) {
+            setStatus({ status: 'result', result: 'Something went wrong!' })
+            return
+        }
+
+    }, [createProfile])
+
+    const onProceed = () => {
+        createProfileAction({
+            firstName: data.name,
+            lastName: data.name,
+            bio: data.bio,
+            birthday: utils.dateToString(data.date),
+            cityId: 2,
+            interests: data.interests.map((i) => i.id),
+            socials: {
+                instagram: "nuniTelo",
+                twitter: "nunitelo",
+                facebook: "NuniTelo",
+                tiktok: "tik",
+                linkedin: "Naun Telo"
+            },
+            profilePicture: data.profilePicture,
+            token: token,
+        })
     }
 
     const onPickImage = async () => {
@@ -48,18 +125,37 @@ const CreateProfile = ({ route, navigation, uploadPhotoAction, createProfileActi
             allowsEditing: true,
             aspect: [4, 3],
             quality: 1,
+            base64: true
         });
+
+        console.log(result)
 
         if (!result.cancelled) {
             setData({ ...data, image: result })
         }
     };
 
-    useEffect(() => { 
-        uploadPhotoAction({ token: token, image: data.image })
-    }, [data.image])
+    const onInterestChanged = (interest, pressed) => {
+        let oldInterests = data.interests
 
-    useEffect(() => {
+        if (interests.loaded && interests.data.result) {
+            let interestObject = interests.data.result.filter(i => i.name == interest)[0];
+            if (interestObject) {
+                if (pressed) {
+                    if (!oldInterests.includes(interestObject.name)) {
+                        oldInterests = [...oldInterests, interestObject]
+                    }
+                } else {
+                    oldInterests = oldInterests.filter(i => i.name != interest)
+                }
+            }
+        }
+
+        setData({ ...data, interests: oldInterests })
+
+    }
+
+    const askPhotosPermission = () => {
         (async () => {
             if (Platform.OS !== 'web') {
                 const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -68,7 +164,8 @@ const CreateProfile = ({ route, navigation, uploadPhotoAction, createProfileActi
                 }
             }
         })();
-    }, []);
+    }
+    console.log(data)
 
     return (
         <ScrollView contentContainerStyle={style.container}>
@@ -92,15 +189,28 @@ const CreateProfile = ({ route, navigation, uploadPhotoAction, createProfileActi
                 </View>
 
                 <Section label="NAME SURNAME">
-                    <TextInput style={style.thickLabel} value={data.name} onChange={(e) => setData({ ...data, ['name']: e })} />
+                    <Input inputStyles={{ ...style.thickLabel, paddingHorizontal: 0, paddingBottom: 0, borderColor: colors.WHITE }} value={data['name']} onChange={(e) => setData({ ...data, ['name']: e })} />
                 </Section>
 
                 <Section label="DOVE VIVI?">
-                    <TextInput style={style.thinLabel} value={data.place} onChange={(e) => setData({ ...data, ['place']: e })} />
+                    <Select items={citiesList.loaded && citiesList?.data?.result ? citiesList.data.result.map(city => {
+                        return {
+                            label: city.name,
+                            value: city.id
+                        }
+                    }) : []}
+                        onChange={(city) => setData({ ...data, city: city })}
+                        placeholder=""
+                        defaultValue=""
+                    />
                 </Section>
 
                 <Section label="BIO">
-                    <TextInput style={style.thinLabel} value={data['bio']} onChange={(e) => setData({ ...data, ['bio']: e })} placeholder="write a bio here" />
+                    <Input inputStyles={{ ...style.thinLabel, paddingHorizontal: 0, paddingBottom: 0, borderColor: colors.WHITE }} value={data['bio']} onChange={(e) => setData({ ...data, ['bio']: e })} />
+                </Section>
+
+                <Section label="INTERESTS">
+                    {interests.loaded && interests?.data?.result && <InterestsView list={interests?.data?.result.map(i => i.name)} onChange={(interest, pressed) => onInterestChanged(interest, pressed)} />}
                 </Section>
 
                 <Section label="ETA">
@@ -110,14 +220,17 @@ const CreateProfile = ({ route, navigation, uploadPhotoAction, createProfileActi
                             <Text style={style.dateText}>{data.date.month}</Text>
                             <Text style={style.dateText}>{data.date.year}</Text>
                         </View>
-                        {show && (
+                        {show == true && (
                             <DateTimePicker
                                 testID="dateTimePicker"
                                 value={date}
                                 mode={'date'}
                                 is24Hour={true}
                                 display="default"
-                                onChange={(e, date) => onDateChange(date)}
+                                onChange={(e, date) => {
+                                    setShow(false)
+                                    setData({ ...data, ['date']: utils.dateToObject(date) })
+                                }}
                             />
                         )}
                     </TouchableOpacity>
@@ -132,7 +245,7 @@ const CreateProfile = ({ route, navigation, uploadPhotoAction, createProfileActi
             </View>
 
             <View style={{ paddingVertical: 40, width: '80%', justifyContent: 'center', alignSelf: 'center' }}>
-                <Loading status="">
+                <Loading status={status.status} result={status.result}>
                     <MainBtn title="Proceed" type="red" thick onClick={() => onProceed()} />
                 </Loading>
             </View>
@@ -215,6 +328,8 @@ const style = StyleSheet.create({
 export default connect(null, (dispatch) => {
     return {
         uploadPhotoAction: p => dispatch(uploadPhoto(p)),
-        createProfileAction: p => dispatch(createProfile(p))
+        createProfileAction: p => dispatch(createProfile(p)),
+        getCitiesList: p => dispatch(getCities(p)),
+        getInterestsList: () => dispatch(getInterests())
     }
 })(CreateProfile)

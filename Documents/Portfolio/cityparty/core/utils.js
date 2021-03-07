@@ -30,5 +30,40 @@ export default {
             month: month[date.getMonth()],
             year: date.getFullYear()
         }
-    }
+    },
+    dateToString: (date) => {
+        return `${date.day}/${date.month}/${date.year}`
+    },
+    toGrid: (arr) => {
+        let grid = []
+      
+        for (let i = 0; i < arr.length; i += 3) {
+          let row = []
+      
+          if (arr[i]) {
+            row[0] = arr[i]
+          }
+          if (arr[i + 1]) {
+            row[1] = arr[i + 1]
+          }
+          if (arr[i + 2]) {
+            row[2] = arr[i + 2]
+          }
+      
+      
+          if (row.length == 1) {
+            row[1] = ""
+            row[2] = ""
+          }
+      
+          if (row.length == 2) {
+            row[2] = ""
+          }
+      
+          grid[i] = row
+        }
+      
+       
+        return grid
+      }
 }

@@ -74,8 +74,8 @@ const LoginScreen = ({ navigation, loginUser }) => {
         <Text style={style.text}>Cityparty</Text>
       </View>
       <View style={{ flex: 2, flexDirection: 'column' }} >
-        <Input field={"email"} error={error} placeholder={'EMAIL'} value={data['email']} onChange={e => setData({ ...data, ['email']: e })} styles={style.input} />
-        <Input field={"password"} error={error} placeholder={'PASSWORD'} value={data['password']} secureTextEntry onChange={e => setData({ ...data, ['password']: e })} styles={style.input} />
+        <Input field={"email"} error={error} placeholder={'EMAIL'} value={data['email']} onChange={e => setData({ ...data, ['email']: e })} styles={style.input} errorVisible />
+        <Input field={"password"} error={error} placeholder={'PASSWORD'} value={data['password']} secureTextEntry onChange={e => setData({ ...data, ['password']: e })} styles={style.input} errorVisible/>
         <View style={{ flex: 0.5 }} />
         <Loading status={status.status} result={status.result}>
           <MainBtn title="Login" type="red" style={style.login} onClick={() => onLogin()} />

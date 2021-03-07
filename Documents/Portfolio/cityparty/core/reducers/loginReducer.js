@@ -36,7 +36,7 @@ export function register(state = {
     }
 }
 
-export function creteProfile(state = {
+export function createProfile(state = {
     creating: false,
     created: false,
     errored: false,
@@ -107,6 +107,25 @@ export function uploadPhoto(state = {
             return { ...state, uploading: false, uploaded: true, data: action.payload }
         case 'OWN_USER_INFO_FAIL':
             return { ...state, uploading: false, uploaded: false, errored: true, error: action.payload }
+        default:
+            return state
+    }
+}
+
+export function interests(state = {
+    loading: false,
+    loaded: false,
+    errored: false,
+    error: null,
+    data: null,
+}, action) {
+    switch (action.type) {
+        case 'GET_INTERESTS_START':
+            return { ...state, loading: true }
+        case 'GET_INTERESTS_SUCCESS':
+            return { ...state, loading: false, loaded: true, data: action.payload }
+        case 'GET_INTERESTS_FAIL':
+            return { ...state, loading: false, loaded: false, errored: true, error: action.payload }
         default:
             return state
     }

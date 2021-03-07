@@ -5,7 +5,6 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import colors from '../colors'
 
 const Select = ({ items, placeholder, defaultValue, onChange }) => {
-
     const [selected, setSelected] = useState({})
 
     useEffect(() => {
@@ -22,7 +21,8 @@ const Select = ({ items, placeholder, defaultValue, onChange }) => {
             style={style.appSelect}
             itemStyle={style.itemStyle}
             dropDownStyle={style.dropDownStyle}
-            labelStyle={style.labelStyle}
+            labelStyle={style.labelStyle} 
+            style={{zIndex: 9000}}
         />
     )
 }
@@ -31,6 +31,7 @@ const style = StyleSheet.create({
     appSelectContainer: {
         height: 40,
         width: '100%',
+        backgroundColor: colors.WHITE,
     },
     appSelect: {
         borderTopLeftRadius: 30, 
@@ -41,10 +42,11 @@ const style = StyleSheet.create({
     },
     itemStyle: {
         justifyContent: 'flex-start',
+        backgroundColor: colors.WHITE,
 
     },
     dropDownStyle: {
-        backgroundColor: colors.WHITE
+        backgroundColor: colors.WHITE,
     },
     labelStyle: {
         fontSize: 16,

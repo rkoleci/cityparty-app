@@ -121,9 +121,9 @@ const RegisterScreen = ({ navigation, registerUser }) => {
       </View>
       <View style={{ flex: 2.1, flexDirection: 'column' }}>
         <View style={style.inputContainer}>
-          <Input field={"email"} error={error} placeholder={'EMAIL'} value={data['email']} onChange={e => setData({ ...data, ['email']: e })} styles={style.input} />
-          <Input field={"name"} error={error} placeholder={'NAME SURNAME'} value={data['name']} onChange={e => setData({ ...data, ['name']: e })} styles={style.input} />
-          <Input field={"password"} error={error} placeholder={'PASSWORD'} value={data['password']} secureTextEntry onChange={e => setData({ ...data, ['password']: e })} styles={style.input} />
+          <Input field={"email"} error={error} placeholder={'EMAIL'} value={data['email']} onChange={e => setData({ ...data, ['email']: e })} styles={style.input} errorVisible />
+          <Input field={"name"} error={error} placeholder={'NAME SURNAME'} value={data['name']} onChange={e => setData({ ...data, ['name']: e })} styles={style.input} errorVisible />
+          <Input field={"password"} error={error} placeholder={'PASSWORD'} value={data['password']} secureTextEntry onChange={e => setData({ ...data, ['password']: e })} styles={style.input} errorVisible />
         </View>
         <View style={{ flex: 0.7, flexDirection: 'row', alignItems: 'center', width: '80%', alignSelf: 'center' }}>
           <View style={{ flexDirection: 'row', flex: 1, }}>
